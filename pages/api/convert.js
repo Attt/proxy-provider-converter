@@ -1,7 +1,11 @@
 const YAML = require("yaml");
 const axios = require("axios");
 
-module.exports = async (req, res) => {
+export const config = {
+  runtime: 'edge',
+};
+
+export async (req, res) => {
   const url = req.query.url;
   const target = req.query.target;
   console.log(`query: ${JSON.stringify(req.query)}`);
@@ -120,4 +124,3 @@ module.exports = async (req, res) => {
     res.status(200).send(response);
   }
 };
-export const config = { runtime: 'edge' };
