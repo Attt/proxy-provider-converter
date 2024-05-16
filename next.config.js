@@ -2,6 +2,13 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
 
+const nextConfig = {
+  // configs
+  experimental: {
+    runtime: 'edge',
+  },
+}
+
 module.exports = withBundleAnalyzer({
   swcMinify: true,
   webpack(config, { dev, isServer }) {
