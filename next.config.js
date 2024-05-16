@@ -2,15 +2,11 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
 
-const nextConfig = {
-  // configs
+module.exports = withBundleAnalyzer({
+  swcMinify: true,
   experimental: {
     runtime: 'edge',
   },
-}
-
-module.exports = withBundleAnalyzer({
-  swcMinify: true,
   webpack(config, { dev, isServer }) {
     // Replace React with Preact only in client production build
     if (!dev && !isServer) {
