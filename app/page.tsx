@@ -1,13 +1,15 @@
+"use client";
 import Head from "next/head";
 import { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { SelectorIcon, DuplicateIcon } from "@heroicons/react/outline";
+import { ArrowsUpDownIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import toast, { Toaster } from "react-hot-toast";
 
 let host = "";
 if (typeof window !== "undefined") {
   host = window.location.origin;
 }
+
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -60,13 +62,13 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
 `;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Head>
         <title>Proxy Provider Converter</title>
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
 
-      <main className="flex flex-col items-start flex-1 max-w-4xl px-4 py-8 md:py-12">
+      <div className="flex flex-col items-start flex-1 max-w-4xl px-4 py-8 md:py-12">
         <div className="flex flex-col items-start md:items-center md:flex-row">
           <img src="/logo.svg" alt="Logo" className="md:mr-4 h-28" />
           <div>
@@ -116,7 +118,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
                 <option value="clash">转换到 Clash</option>
                 <option value="surge">转换到 Surge</option>
               </select>
-              <SelectorIcon className="absolute h-6 top-3.5 right-3 text-gray-400" />
+              <ArrowsUpDownIcon className="absolute h-6 top-3.5 right-3 text-gray-400" />
             </div>
           </div>
         </div>
@@ -126,7 +128,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
 
             <CopyToClipboard text={convertedUrl} onCopy={() => copiedToast()}>
               <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
-                <DuplicateIcon className="h-5 w-5 mr-1 inline-block" />
+                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
                 点击复制
               </div>
             </CopyToClipboard>
@@ -147,7 +149,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
               onCopy={() => copiedToast()}
             >
               <div className="flex items-center text-sm mt-4 text-gray-400 cursor-pointer hover:text-gray-300 transition duration-200 select-none">
-                <DuplicateIcon className="h-5 w-5 mr-1 inline-block" />
+                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
                 点击复制
               </div>
             </CopyToClipboard>
@@ -230,7 +232,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </li>
           </ul>
         </div>
-      </main>
+      </div>
 
       <footer className="w-full p-4 max-w-4xl md:py-8">
         <a
@@ -245,6 +247,6 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
       </footer>
 
       <Toaster />
-    </div>
+    </main>
   );
 }
