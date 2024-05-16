@@ -5,7 +5,7 @@ export const config = {
   runtime: 'edge',
 };
 
-export async (req, res) => {
+export default async (req, res) => {
   const url = req.query.url;
   const target = req.query.target;
   console.log(`query: ${JSON.stringify(req.query)}`);
