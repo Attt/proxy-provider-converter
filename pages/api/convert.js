@@ -120,3 +120,4 @@ module.exports = async (req, res) => {
     res.status(200).send(response);
   }
 };
+export const config = { runtime: 'edge' };
