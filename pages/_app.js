@@ -9,5 +9,5 @@ function MyApp({ Component, pageProps }) {
   });
   return <Component {...pageProps} />;
 }
-
+export const runtime = 'edge';
 export default MyApp;

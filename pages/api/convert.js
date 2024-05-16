@@ -1,9 +1,6 @@
 const YAML = require("yaml");
 const axios = require("axios");
 
-export const config = {
-  runtime: 'edge',
-};
 
 export default async (req, res) => {
   const url = req.query.url;
@@ -124,3 +121,5 @@ export default async (req, res) => {
     res.status(200).send(response);
   }
 };
+
+export const runtime = 'edge';
