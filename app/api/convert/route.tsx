@@ -1,6 +1,8 @@
-import { type NextRequest, NextResponse } from 'next/server'
-import axios, { AxiosError, AxiosAdapter } from 'axios';
-import * as YAML from 'js-yaml';
+import { type NextRequest } from 'next/server'
+import axios, { AxiosError, AxiosRequestHeaders } from 'axios';
+import fetchAdapter from '@vespaiach/axios-fetch-adapter';
+import YAML from 'yaml';
+import { Buffer } from "buffer";
 
 export const runtime = 'edge';
 
@@ -44,15 +46,18 @@ export async function GET(request: NextRequest,
     let configFile: string | null = null;
     try {
 
-        const result = await axios.get(params.url, {
-            headers: {
-                "User-Agent": "ClashX Pro/1.72.0.4 (com.west2online.ClashXPro; build:1.72.0.4; macOS 12.0.1) Alamofire/5.4.4",
-            },
-            adapter: axios.defaults.adapter as AxiosAdapter
+        const service = axios.create({ adapter: fetchAdapter })
+        const genHeaders: AxiosRequestHeaders = {
+            'user-agent' : "ClashX Pro/1.72.0.4 (com.west2online.ClashXPro; build:1.72.0.4; macOS 12.0.1) Alamofire/5.4.4"
+        }
+        // FIXME 这里的header不起作用
+        const result = await service.get(params.url, {
+            headers: genHeaders
         });
         configFile = result.data;
+        
     } catch (error: unknown) {
-        // 使用AxiosError类型来捕获错误 TODO fix : Unable to get url, error: adapter is not a function
+        // 使用AxiosError类型来捕获错误
         const axiosError = error as AxiosError;
         return new Response(`Unable to get url, error: ${axiosError.message}`, {
             status: 400
@@ -62,7 +67,13 @@ export async function GET(request: NextRequest,
     console.log(`Parsing YAML`);
     let configData: any; // 这里需要定义具体的类型，根据实际解析的YAML内容
     try {
-        configData = YAML.load(configFile!);
+        configData = YAML.parse(configFile!);
+        if (configData.proxies === undefined) {
+            try{
+                configData = Buffer.from(configData, 'base64').toString('binary');
+            } catch (error) {
+            }
+        }
         console.log(`👌 Parsed YAML`);
     } catch (error) {
         return new Response(`Unable parse config, error: ${error}`, {
@@ -70,6 +81,7 @@ export async function GET(request: NextRequest,
           });
     }
 
+    
     if (configData.proxies === undefined) {
         return new Response("No proxies in this config", {
             status: 400
@@ -154,7 +166,7 @@ export async function GET(request: NextRequest,
           headers: { 'Content-Type': 'text/plain; charset=utf-8' },
         })
     } else {
-        const response = YAML.dump({ proxies: configData.proxies });
+        const response = YAML.stringify({ proxies: configData.proxies });
         return new Response(response, {
             status: 200,
             headers: { 'Content-Type': 'text/plain; charset=utf-8' },
