@@ -3,7 +3,7 @@ import "../styles/global.css";
 import splitbee from "@splitbee/web";
 
 export const config = {
-	runtime: 'edge',
+	runtime: 'experimental-edge',
 };
 
 export const getServerSideProps = async () => {

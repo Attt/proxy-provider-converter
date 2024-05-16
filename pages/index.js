@@ -248,4 +248,4 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
     </div>
   );
 }
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';

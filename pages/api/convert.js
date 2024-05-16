@@ -1,10 +1,10 @@
 const YAML = require("yaml");
 const axios = require("axios");
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export const config = {
-	runtime: 'edge',
+	runtime: 'experimental-edge',
 };
 
 export default async (req, res) => {
