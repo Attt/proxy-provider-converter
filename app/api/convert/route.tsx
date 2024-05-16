@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import axios, { AxiosError } from 'axios';
+import { type NextRequest, NextResponse } from 'next/server'
+import axios, { AxiosError, AxiosAdapter } from 'axios';
 import * as YAML from 'js-yaml';
 
 export const runtime = 'edge';
@@ -26,37 +26,37 @@ interface Proxy {
     sni?: string;
 }
 
-// 使用Next.js的API路由处理函数
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
+export async function GET(request: NextRequest,
+  { params }: { params: { url: string, target: string } }
 ) {
-    const { rawRrl, target } = req.query;
-    // 确保url是字符串类型
-    const url = Array.isArray(rawRrl) ? rawRrl[0] : rawRrl;
 
     // 使用模板字符串输出日志信息
-    console.log(`query: ${JSON.stringify(req.query)}`);
+    console.log(`query: ${JSON.stringify(request)}`);
 
     // 使用可选链操作符检查url是否存在
-    if (!url) {
-        return res.status(400).send("Missing parameter: url");
+    if (!params.url) {
+        return new Response('Missing parameter: url', {
+            status: 400
+          });
     }
 
-    console.log(`Fetching url: ${url}`);
+    console.log(`Fetching url: ${params.url}`);
     let configFile: string | null = null;
     try {
 
-        const result = await axios.get(url, {
+        const result = await axios.get(params.url, {
             headers: {
                 "User-Agent": "ClashX Pro/1.72.0.4 (com.west2online.ClashXPro; build:1.72.0.4; macOS 12.0.1) Alamofire/5.4.4",
             },
+            adapter: axios.defaults.adapter as AxiosAdapter
         });
         configFile = result.data;
     } catch (error: unknown) {
-        // 使用AxiosError类型来捕获错误
+        // 使用AxiosError类型来捕获错误 TODO fix : Unable to get url, error: adapter is not a function
         const axiosError = error as AxiosError;
-        return res.status(400).send(`Unable to get url, error: ${axiosError.message}`);
+        return new Response(`Unable to get url, error: ${axiosError.message}`, {
+            status: 400
+          });
     }
 
     console.log(`Parsing YAML`);
@@ -65,16 +65,19 @@ export default async function handler(
         configData = YAML.load(configFile!);
         console.log(`👌 Parsed YAML`);
     } catch (error) {
-        return res.status(500).send(`Unable parse config, error: ${error}`);
+        return new Response(`Unable parse config, error: ${error}`, {
+            status: 500
+          });
     }
 
     if (configData.proxies === undefined) {
-        res.status(400).send("No proxies in this config");
-        return;
+        return new Response("No proxies in this config", {
+            status: 400
+          });
     }
 
 
-    if (target === 'surge') {
+    if (params.target === 'surge') {
         const supportedProxies = configData.proxies.filter((proxy: { type: string; }) =>
             ["ss", "vmess", "trojan"].includes(proxy.type)
         );
@@ -146,11 +149,15 @@ export default async function handler(
             }
         });
         const proxies = surgeProxies.filter((p: { type: string }) => p !== undefined);
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        res.status(200).send(proxies.join("\n"));
+        return new Response(proxies.join("\n"), {
+          status: 200,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        })
     } else {
         const response = YAML.dump({ proxies: configData.proxies });
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        return res.status(200).send(response);
+        return new Response(response, {
+            status: 200,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          })
     }
 }
