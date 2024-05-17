@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image'
 import Head from "next/head";
 import { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -16,6 +17,7 @@ export default function Home() {
   const [target, setTarget] = useState("clash");
   const [include, setInclude] = useState("");
   const [exclude, setExclude] = useState("");
+  const [configContent, setConfigContent] = useState("");
 
   const convertedUrl = `${host}/api/convert?url=${encodeURIComponent(
     url
@@ -67,6 +69,14 @@ proxy-providers:
 ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
 `;
 
+  async function fetchConfigContent() {
+    if(!`${url}`) {
+      return;
+    }
+    const res = await fetch(`${convertedUrl}`)
+    setConfigContent(await res.text());
+  }
+
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Head>
@@ -76,7 +86,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
 
       <div className="flex flex-col items-start flex-1 max-w-4xl px-4 py-8 md:py-12">
         <div className="flex flex-col items-start md:items-center md:flex-row">
-          <img src="/logo.svg" alt="Logo" className="md:mr-4 h-28" />
+          <Image src="/logo.svg" alt="Logo" className="md:mr-4 h-28" width={100} height={100} />
           <div>
             <h1 className="text-2xl font-extrabold text-black md:text-5xl">
               Proxy Provider Converter
@@ -109,22 +119,44 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </div>
           </div>
           <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
-            <input
-              className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
-              placeholder="包含节点正则表达式"
-              value={include}
-              onChange={(e) => setInclude(e.target.value)}
-            />
-          </div>
-          <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
-            <input
-              className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
-              placeholder="排除节点正则表达式"
-              value={exclude}
-              onChange={(e) => setExclude(e.target.value)}
-            />
+            <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+              <input
+                className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                placeholder="包含节点正则表达式"
+                value={include}
+                onChange={(e) => setInclude(e.target.value)}
+              />
+            </div>
+            <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+              <input
+                className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                placeholder="排除节点正则表达式"
+                value={exclude}
+                onChange={(e) => setExclude(e.target.value)}
+              />
+            </div>
+            <div className="relative">
+              <button
+                className="w-full md:w-max py-3 mt-4 pl-4 pr-10 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                onClick={fetchConfigContent}
+              >
+                节点预览
+              </button>
+            </div>
           </div>
         </div>
+        {url && configContent && (
+          <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg hidden md:block">
+            <pre><code>{configContent}</code></pre>
+
+            <CopyToClipboard text={configContent} onCopy={() => copiedToast()}>
+              <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
+                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
+                点击复制
+              </div>
+            </CopyToClipboard>
+          </div>
+        )}
         {url && (
           <div className="break-all p-3 mt-4 rounded-lg text-gray-100 bg-gray-900 shadow-sm w-full">
             {convertedUrl}
@@ -182,8 +214,8 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             简单的正则示例
           </h3>
           <p className="mt-2">
-            包含"hk"或者"hong kong": hk|hong kong<br></br>
-            匹配"hong kong 0.2x"或者"japan 0.1x": (hong kong|japan).*0\.
+            包含&quot;hk&quot;或者&quot;hong kong&quot;: <pre><code className='font-bold'>hk|hong kong</code></pre><br></br>
+            匹配&quot;hong kong 0.2x&quot;或者&quot;japan 0.1x&quot;: <pre><code className='font-bold'>(hong kong|japan).*0\.</code></pre>
           </p>
         </div>
         <div className="w-full text-gray-900 mt-14">
@@ -191,52 +223,58 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             怎么自己部署转换工具？
           </h3>
           <p className="mt-2">
-            使用工具时，{host}{" "}
+            使用工具时， {host}
             的拥有者将会有权限查看到你的订阅地址，如果你不想让给他人这种权限，
-            你可以根据下面步骤你可以零成本部署一个属于你的转换工具。
+            你可以fork下面仓库零成本部署一个属于你的转换工具。
           </p>
-          <p className="mt-2">
-            {" "}
-            前期准备：你需要一个{" "}
-            <a
-              href="https://github.com"
-              target="_blank"
-              className="text-yellow-600 transition hover:text-yellow-500"
-            >
-              GitHub
-            </a>{" "}
-            账号
-          </p>
-          <ul className="mt-1">
+          <ul>
             <li>
-              1. 打开{" "}
-              <a
-                href="https://github.com/qier222/proxy-provider-converter"
-                target="_blank"
-                className="text-yellow-600 transition hover:text-yellow-500"
-              >
-                https://github.com/qier222/proxy-provider-converter
-              </a>
-            </li>
-            <li>2. 点击右上角的 Fork 按钮</li>
-            <li>
-              3. 打开{" "}
-              <a
-                href="https://vercel.com"
-                target="_blank"
-                className="text-yellow-600 transition hover:text-yellow-500"
-              >
-                Vercel.com
-              </a>
-              ，使用 GitHub 登录。
+              <p className="mt-2">
+                如果使用原版工具并且部署在{" "}
+                <a
+                  href="https://vercel.com"
+                  target="_blank"
+                  className="text-yellow-600 transition hover:text-yellow-500"
+                >
+                  Vercel.com
+                </a>
+                ，请转到{" "}
+                <a
+                  href="https://github.com/qier222/proxy-provider-converter"
+                  target="_blank"
+                  className="text-yellow-600 transition hover:text-yellow-500"
+                >
+                  https://github.com/qier222/proxy-provider-converter
+                </a>
+              </p>
             </li>
             <li>
-              4. 选择 New Project，点击 proxy-provider-converter 旁边的 Import
-              按钮, 点击 PERSONAL ACCOUNT 旁边的 Select，最后点击 Deploy
-            </li>
-            <li>
-              5. 等待部署完成后点击 Vercel 项目面板上的 Visit
-              按钮就可以访问你部署的版本了
+              <p className="mt-2">
+                如果使用当前页面上的版本并且部署在{" "}
+                <a
+                  href="https://pages.cloudflare.com/"
+                  target="_blank"
+                  className="text-yellow-600 transition hover:text-yellow-500"
+                >
+                  Cloudflare Pages
+                </a>
+                ，请转到{" "}：
+                <a
+                  href="https://github.com/Attt/proxy-provider-converter"
+                  target="_blank"
+                  className="text-yellow-600 transition hover:text-yellow-500"
+                >
+                  https://github.com/Attt/proxy-provider-converter
+                </a>{" "}的{" "}
+                <a
+                  href="https://github.com/Attt/proxy-provider-converter/tree/cf-pages"
+                  target="_blank"
+                  className="text-yellow-600 transition hover:text-yellow-500"
+                >
+                  cf-pages
+                </a>{" "}
+                分支
+              </p>
             </li>
           </ul>
         </div>
@@ -273,7 +311,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
           rel="noopener noreferrer"
         >
           Powered by
-          <img src="/next.svg" alt="Next Logo" className="h-4 ml-2" />
+          <Image src="/next.svg" alt="Next Logo" className="h-4 ml-2" width={394} height={80} />
         </a>
       </footer>
 
