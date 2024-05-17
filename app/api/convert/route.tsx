@@ -91,8 +91,9 @@ export async function GET(request: NextRequest,
     const filteredProxies = []
     for (const proxy of configData.proxies) {
         // 过滤
-        if (proxy.name && (
-            (!params.include || proxy.name.match(params.include)) && 
+        const proxyName: string | undefined = proxy.name
+        if (proxyName && (
+            (!params.include || proxyName.match(params.include)) && 
             (!params.exclude || !proxy.name.match(params.exclude))
         )) {
             filteredProxies.push(proxy);

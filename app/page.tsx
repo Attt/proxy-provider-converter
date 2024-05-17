@@ -19,11 +19,9 @@ export default function Home() {
 
   const convertedUrl = `${host}/api/convert?url=${encodeURIComponent(
     url
-  )}&target=${target}
-  &include=${encodeURIComponent(
+  )}&target=${target}&include=${!include ? '' : encodeURIComponent(
     include
-  )}
-  &exclude=${encodeURIComponent(
+  )}&exclude=${!exclude ? '' : encodeURIComponent(
     exclude
   )}`;
 
@@ -89,25 +87,6 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </p>
           </div>
         </div>
-        <div className="mt-12 text-gray-900">
-          <h3 className="text-lg md:text-xl font-bold">
-            什么是 Proxy Provider 和 External Group？
-          </h3>
-          <p className="mt-2">
-            <a
-              href="https://github.com/Dreamacro/clash/wiki/configuration#proxy-providers"
-              className="text-yellow-600 transition hover:text-yellow-500"
-            >
-              Proxy Provider
-            </a>{" "}
-            是 Clash
-            的一项功能，可以让用户从指定路径动态加载代理服务器列表。使用这个功能你可以将
-            Clash
-            订阅里面的代理服务器提取出来，放到你喜欢的配置文件里，也可以将多个
-            Clash 订阅里的代理服务器混合到一个配置文件里。External Group 则是
-            Proxy Provider 在 Surge 里的叫法，作用是一样的。
-          </p>
-        </div>
         <div className="w-full text-gray-900 mt-14">
           <h3 className="text-lg md:text-xl font-bold">开始使用</h3>
           <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
@@ -133,7 +112,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             <input
               className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
               placeholder="包含节点正则表达式"
-              value={url}
+              value={include}
               onChange={(e) => setInclude(e.target.value)}
             />
           </div>
@@ -141,7 +120,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             <input
               className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
               placeholder="排除节点正则表达式"
-              value={url}
+              value={exclude}
               onChange={(e) => setExclude(e.target.value)}
             />
           </div>
@@ -179,6 +158,34 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </CopyToClipboard>
           </div>
         )}
+        <div className="mt-12 text-gray-900">
+          <h3 className="text-lg md:text-xl font-bold">
+            什么是 Proxy Provider 和 External Group？
+          </h3>
+          <p className="mt-2">
+            <a
+              href="https://github.com/Dreamacro/clash/wiki/configuration#proxy-providers"
+              className="text-yellow-600 transition hover:text-yellow-500"
+            >
+              Proxy Provider
+            </a>{" "}
+            是 Clash
+            的一项功能，可以让用户从指定路径动态加载代理服务器列表。使用这个功能你可以将
+            Clash
+            订阅里面的代理服务器提取出来，放到你喜欢的配置文件里，也可以将多个
+            Clash 订阅里的代理服务器混合到一个配置文件里。External Group 则是
+            Proxy Provider 在 Surge 里的叫法，作用是一样的。
+          </p>
+        </div>
+        <div className="mt-12 text-gray-900">
+          <h3 className="text-lg md:text-xl font-bold">
+            简单的正则示例
+          </h3>
+          <p className="mt-2">
+            包含"hk"或者"hong kong": hk|hong kong<br></br>
+            匹配"hong kong 0.2x"或者"japan 0.1x": (hong kong|japan).*0\.
+          </p>
+        </div>
         <div className="w-full text-gray-900 mt-14">
           <h3 className="text-lg md:text-xl font-bold">
             怎么自己部署转换工具？
