@@ -118,7 +118,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
               <ArrowsUpDownIcon className="absolute h-6 top-3.5 right-3 text-gray-400" />
             </div>
           </div>
-          <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+          <div className="flex w-full flex-col gap-4 md:flex-row" style={{ rowGap: 0 }}>
             <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
               <input
                 className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
@@ -145,18 +145,6 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </div>
           </div>
         </div>
-        {url && configContent && (
-          <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg hidden md:block">
-            <pre><code>{configContent}</code></pre>
-
-            <CopyToClipboard text={configContent} onCopy={() => copiedToast()}>
-              <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
-                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
-                点击复制
-              </div>
-            </CopyToClipboard>
-          </div>
-        )}
         {url && (
           <div className="break-all p-3 mt-4 rounded-lg text-gray-100 bg-gray-900 shadow-sm w-full">
             {convertedUrl}
@@ -173,7 +161,9 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
           <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg hidden md:block">
             {/* prettier-ignore */}
             {target !== "surge" && (
-              <pre className="whitespace-pre-wrap">{clashConfig}</pre>
+              <pre className="whitespace-pre-wrap">
+                {clashConfig}
+                </pre>
             )}
 
             {target === "surge" && <pre>{surgeConfig}</pre>}
@@ -184,6 +174,25 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
               onCopy={() => copiedToast()}
             >
               <div className="flex items-center text-sm mt-4 text-gray-400 cursor-pointer hover:text-gray-300 transition duration-200 select-none">
+                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
+                点击复制
+              </div>
+            </CopyToClipboard>
+          </div>
+        )}
+        {url && configContent && (
+          <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg shadow-sm">
+            <pre style={{ wordBreak: "break-all" }} className="whitespace-pre-wrap">
+              <code>
+              # 预览配置来源: {convertedUrl}<br></br>
+              </code>
+              <code>
+                {configContent}
+                </code>
+              </pre>
+
+            <CopyToClipboard text={configContent} onCopy={() => copiedToast()}>
+              <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
                 <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
                 点击复制
               </div>
