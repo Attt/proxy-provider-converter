@@ -81,7 +81,7 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
     <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Head>
         <title>Proxy Provider Converter</title>
-        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="icon" type="image/ico" href="/favicon.ico" />
       </Head>
 
       <div className="flex flex-col items-start flex-1 max-w-4xl px-4 py-8 md:py-12">
@@ -145,6 +145,25 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </div>
           </div>
         </div>
+        {url && configContent && (
+          <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg shadow-sm">
+            <pre style={{ wordBreak: "break-all" }} className="whitespace-pre-wrap">
+              <code>
+              # 预览配置来源: {convertedUrl}<br></br>
+              </code>
+              <code>
+                {configContent}
+                </code>
+              </pre>
+
+            <CopyToClipboard text={configContent} onCopy={() => copiedToast()}>
+              <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
+                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
+                点击复制
+              </div>
+            </CopyToClipboard>
+          </div>
+        )}
         {url && (
           <div className="break-all p-3 mt-4 rounded-lg text-gray-100 bg-gray-900 shadow-sm w-full">
             {convertedUrl}
@@ -180,25 +199,6 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </CopyToClipboard>
           </div>
         )}
-        {url && configContent && (
-          <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg shadow-sm">
-            <pre style={{ wordBreak: "break-all" }} className="whitespace-pre-wrap">
-              <code>
-              # 预览配置来源: {convertedUrl}<br></br>
-              </code>
-              <code>
-                {configContent}
-                </code>
-              </pre>
-
-            <CopyToClipboard text={configContent} onCopy={() => copiedToast()}>
-              <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
-                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
-                点击复制
-              </div>
-            </CopyToClipboard>
-          </div>
-        )}
         <div className="mt-12 text-gray-900">
           <h3 className="text-lg md:text-xl font-bold">
             什么是 Proxy Provider 和 External Group？
@@ -222,10 +222,10 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
           <h3 className="text-lg md:text-xl font-bold">
             简单的正则示例
           </h3>
-          <p className="mt-2">
+          <div className="mt-2">
             包含&quot;hk&quot;或者&quot;hong kong&quot;: <pre><code className='font-bold'>hk|hong kong</code></pre><br></br>
             匹配&quot;hong kong 0.2x&quot;或者&quot;japan 0.1x&quot;: <pre><code className='font-bold'>(hong kong|japan).*0\.</code></pre>
-          </p>
+          </div>
         </div>
         <div className="w-full text-gray-900 mt-14">
           <h3 className="text-lg md:text-xl font-bold">
@@ -314,13 +314,13 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
 
       <footer className="w-full p-4 max-w-4xl md:py-8">
         <a
-          className="flex items-center"
+          className="flex items-center text-gray-600"
           href="https://vercel.com/frameworks/nextjs"
           target="_blank"
           rel="noopener noreferrer"
         >
           Powered by
-          <Image src="/next.svg" alt="Next Logo" className="h-4 ml-2" width={394} height={80} />
+          <Image src="/next.svg" alt="Next Logo" className="h-4 ml-2" width={100} height={80} />
         </a>
       </footer>
 
