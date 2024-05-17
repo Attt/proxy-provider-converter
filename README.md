@@ -1,3 +1,13 @@
+[https://proxy-provider-converter-7jc.pages.dev/](https://proxy-provider-converter-7jc.pages.dev/)
+
+新增功能：
+1. 节点预览
+2. 正则过滤
+
+分支`cf-pages`支持部署到cloudflare pages，模板选择`next-js`。
+
+---
+
 # Proxy Provider Converter
 
 一个可以将 Clash 订阅转换成 Proxy Provider 和 External Group(Surge) 的工具
