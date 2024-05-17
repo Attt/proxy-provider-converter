@@ -29,7 +29,7 @@ interface Proxy {
 }
 
 export async function GET(request: NextRequest,
-  { params }: { params: { url: string, target: string } }
+    { params }: { params: { url: string, target: string, include: string, exclude: string } }
 ) {
 
     // 使用模板字符串输出日志信息
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest,
     if (!params.url) {
         return new Response('Missing parameter: url', {
             status: 400
-          });
+        });
     }
 
     console.log(`Fetching url: ${params.url}`);
@@ -48,20 +48,20 @@ export async function GET(request: NextRequest,
 
         const service = axios.create({ adapter: fetchAdapter })
         const genHeaders: AxiosRequestHeaders = {
-            'user-agent' : "ClashX Pro/1.72.0.4 (com.west2online.ClashXPro; build:1.72.0.4; macOS 12.0.1) Alamofire/5.4.4"
+            'user-agent': "ClashX Pro/1.72.0.4 (com.west2online.ClashXPro; build:1.72.0.4; macOS 12.0.1) Alamofire/5.4.4"
         }
         // FIXME 这里的header不起作用
         const result = await service.get(params.url, {
             headers: genHeaders
         });
         configFile = result.data;
-        
+
     } catch (error: unknown) {
         // 使用AxiosError类型来捕获错误
         const axiosError = error as AxiosError;
         return new Response(`Unable to get url, error: ${axiosError.message}`, {
             status: 400
-          });
+        });
     }
 
     console.log(`Parsing YAML`);
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest,
     try {
         configData = YAML.parse(configFile!);
         if (configData.proxies === undefined) {
-            try{
+            try {
                 configData = Buffer.from(configData, 'base64').toString('binary');
             } catch (error) {
             }
@@ -78,16 +78,28 @@ export async function GET(request: NextRequest,
     } catch (error) {
         return new Response(`Unable parse config, error: ${error}`, {
             status: 500
-          });
+        });
     }
 
-    
+
     if (configData.proxies === undefined) {
         return new Response("No proxies in this config", {
             status: 400
-          });
+        });
     }
 
+    const filteredProxies = []
+    for (const proxy of configData.proxies) {
+        // 过滤
+        if (proxy.name && (
+            (!params.include || proxy.name.match(params.include)) && 
+            (!params.exclude || !proxy.name.match(params.exclude))
+        )) {
+            filteredProxies.push(proxy);
+        }
+    }
+
+    configData.proxies = filteredProxies;
 
     if (params.target === 'surge') {
         const supportedProxies = configData.proxies.filter((proxy: { type: string; }) =>
@@ -162,14 +174,14 @@ export async function GET(request: NextRequest,
         });
         const proxies = surgeProxies.filter((p: { type: string }) => p !== undefined);
         return new Response(proxies.join("\n"), {
-          status: 200,
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+            status: 200,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
         })
     } else {
         const response = YAML.stringify({ proxies: configData.proxies });
         return new Response(response, {
             status: 200,
             headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-          })
+        })
     }
 }

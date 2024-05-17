@@ -14,10 +14,18 @@ if (typeof window !== "undefined") {
 export default function Home() {
   const [url, setUrl] = useState("");
   const [target, setTarget] = useState("clash");
+  const [include, setInclude] = useState("");
+  const [exclude, setExclude] = useState("");
 
   const convertedUrl = `${host}/api/convert?url=${encodeURIComponent(
     url
-  )}&target=${target}`;
+  )}&target=${target}
+  &include=${encodeURIComponent(
+    include
+  )}
+  &exclude=${encodeURIComponent(
+    exclude
+  )}`;
 
   let urlHost = "";
   try {
@@ -120,6 +128,22 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
               </select>
               <ArrowsUpDownIcon className="absolute h-6 top-3.5 right-3 text-gray-400" />
             </div>
+          </div>
+          <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+            <input
+              className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+              placeholder="包含节点正则表达式"
+              value={url}
+              onChange={(e) => setInclude(e.target.value)}
+            />
+          </div>
+          <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+            <input
+              className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+              placeholder="排除节点正则表达式"
+              value={url}
+              onChange={(e) => setExclude(e.target.value)}
+            />
           </div>
         </div>
         {url && (
