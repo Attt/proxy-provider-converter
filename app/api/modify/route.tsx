@@ -80,18 +80,22 @@ export async function GET(request: NextRequest,
         #strategy: consistent-hashing # or round-robin
     */
 
-    const proxy_group_json = JSON.parse(params?.proxy_group)
+    if (params?.proxy_group && configData['proxy-groups']){
+        const proxy_group_json = JSON.parse(params?.proxy_group)
 
-    configData['proxy-groups'].push({
-        'name': proxy_group_json.name,
-        'type': proxy_group_json.type,
-        'proxies': proxy_group_json.proxies,
-        'interval': proxy_group_json.interval,
-        'url': proxy_group_json.url,
-        'strategy': proxy_group_json.strategy
-    })
+        configData['proxy-groups'].push({
+            'name': proxy_group_json.name,
+            'type': proxy_group_json.type,
+            'proxies': proxy_group_json.proxies,
+            'interval': proxy_group_json.interval,
+            'url': proxy_group_json.url,
+            'strategy': proxy_group_json.strategy
+        })
+    }
 
-    configData['rules'].push(params?.rule)
+    if (params?.rule && configData['rules']) {
+        configData['rules'].unshift(params?.rule)
+    }
 
     const response = YAML.stringify({ configData });
         return new Response(response, {
