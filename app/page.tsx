@@ -15,9 +15,13 @@ if (typeof window !== "undefined") {
 export default function Home() {
   const [url, setUrl] = useState("");
   const [target, setTarget] = useState("clash");
+  const [modifyActivated, setModifyActivated] = useState(false);
   const [include, setInclude] = useState("");
   const [exclude, setExclude] = useState("");
+  const [proxyGroup, setProxyGroup] = useState("");
+  const [rule, setRule] = useState("");
   const [configContent, setConfigContent] = useState("");
+  const [modifiedConfigContent, setModifiedConfigContent] = useState("");
 
   const convertedUrl = `${host}/api/convert?url=${encodeURIComponent(
     url
@@ -25,6 +29,15 @@ export default function Home() {
     include
   )}&exclude=${!exclude ? '' : encodeURIComponent(
     exclude
+  )}`;
+
+  // url: string, proxy_group: string, rule: string
+  const modifyUrl = `${host}/api/modify?url=${encodeURIComponent(
+    url
+  )}&proxy_group=${encodeURIComponent(
+    JSON.stringify(JSON.parse(proxyGroup))
+  )}&rule=${encodeURIComponent(
+    rule
   )}`;
 
   let urlHost = "";
@@ -77,6 +90,23 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
     setConfigContent(await res.text());
   }
 
+  async function fetchModifiedConfigContent() {
+    if(!`${url}`) {
+      return;
+    }
+    const res = await fetch(`${modifyUrl}`)
+    setModifiedConfigContent(await res.text());
+  }
+
+  const changeOption = (e: string) => {
+    if( e == 'clash' || e == 'surge') {
+      setTarget(e);
+      setModifyActivated(false);
+    }else {
+      setModifyActivated(true);
+    }
+  }
+
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Head>
@@ -110,42 +140,73 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
               <select
                 className="w-full md:w-max py-3 pl-4 pr-10 text-lg bg-white rounded-lg shadow-sm appearance-none focus:outline-none"
                 value={target}
-                onChange={(e) => setTarget(e.target.value)}
+                onChange={(e) => changeOption(e.target.value)}
               >
                 <option value="clash">转换到 Clash</option>
                 <option value="surge">转换到 Surge</option>
+                <option value="modify">修改配置</option>
               </select>
               <ArrowsUpDownIcon className="absolute h-6 top-3.5 right-3 text-gray-400" />
             </div>
           </div>
-          <div className="flex w-full flex-col gap-4 md:flex-row" style={{ rowGap: 0 }}>
-            <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
-              <input
-                className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
-                placeholder="包含节点正则表达式"
-                value={include}
-                onChange={(e) => setInclude(e.target.value)}
-              />
+          {!modifyActivated && (
+            <div className="flex w-full flex-col gap-4 md:flex-row" style={{ rowGap: 0 }}>
+              <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+                <input
+                  className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                  placeholder="包含节点正则表达式"
+                  value={include}
+                  onChange={(e) => setInclude(e.target.value)}
+                />
+              </div>
+              <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+                <input
+                  className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                  placeholder="排除节点正则表达式"
+                  value={exclude}
+                  onChange={(e) => setExclude(e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <button
+                  className="w-full md:w-max py-3 mt-4 pl-4 pr-10 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                  onClick={fetchConfigContent}
+                >
+                  节点预览
+                </button>
+              </div>
             </div>
-            <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
-              <input
-                className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
-                placeholder="排除节点正则表达式"
-                value={exclude}
-                onChange={(e) => setExclude(e.target.value)}
-              />
-            </div>
-            <div className="relative">
-              <button
-                className="w-full md:w-max py-3 mt-4 pl-4 pr-10 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
-                onClick={fetchConfigContent}
-              >
-                节点预览
-              </button>
-            </div>
-          </div>
+            )}
+            {modifyActivated && (
+              <div className="flex w-full flex-col gap-4 md:flex-row" style={{ rowGap: 0 }}>
+                <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+                  <input
+                    className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                    placeholder="粘贴 新增的Proxy Group Json到这里"
+                    value={proxyGroup}
+                    onChange={(e) => setProxyGroup(e.target.value)}
+                  />
+                </div>
+                <div className="flex w-full gap-4 mt-4 flex-col md:flex-row">
+                  <input
+                    className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                    placeholder="粘贴 新增的Rule到这里"
+                    value={rule}
+                    onChange={(e) => setRule(e.target.value)}
+                  />
+                </div>
+                <div className="relative">
+                  <button
+                    className="w-full md:w-max py-3 mt-4 pl-4 pr-10 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
+                    onClick={fetchModifiedConfigContent}
+                  >
+                    修改预览
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
-        {url && configContent && (
+        {!modifyActivated && url && configContent && (
           <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg shadow-sm">
             <pre style={{ wordBreak: "break-all" }} className="whitespace-pre-wrap">
               <code>
@@ -164,7 +225,26 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </CopyToClipboard>
           </div>
         )}
-        {url && (
+        {modifyActivated && url && modifiedConfigContent && (
+          <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg shadow-sm">
+            <pre style={{ wordBreak: "break-all" }} className="whitespace-pre-wrap">
+              <code>
+              # 预览配置来源: {modifyUrl}<br></br>
+              </code>
+              <code>
+                {modifiedConfigContent}
+                </code>
+              </pre>
+
+            <CopyToClipboard text={modifiedConfigContent} onCopy={() => copiedToast()}>
+              <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
+                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
+                点击复制
+              </div>
+            </CopyToClipboard>
+          </div>
+        )}
+        {!modifyActivated && url && (
           <div className="break-all p-3 mt-4 rounded-lg text-gray-100 bg-gray-900 shadow-sm w-full">
             {convertedUrl}
 
@@ -176,7 +256,19 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
             </CopyToClipboard>
           </div>
         )}
-        {url && (
+        {modifyActivated && url && (
+          <div className="break-all p-3 mt-4 rounded-lg text-gray-100 bg-gray-900 shadow-sm w-full">
+            {modifyUrl}
+
+            <CopyToClipboard text={modifyUrl} onCopy={() => copiedToast()}>
+              <div className="flex items-center text-sm mt-4 text-gray-400  cursor-pointer  hover:text-gray-300 transition duration-200 select-none">
+                <DocumentDuplicateIcon className="h-5 w-5 mr-1 inline-block" />
+                点击复制
+              </div>
+            </CopyToClipboard>
+          </div>
+        )}
+        {!modifyActivated && url && (
           <div className="w-full p-4 mt-4 text-gray-100 bg-gray-900 rounded-lg hidden md:block">
             {/* prettier-ignore */}
             {target !== "surge" && (
