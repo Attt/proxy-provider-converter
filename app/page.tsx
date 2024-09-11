@@ -19,7 +19,7 @@ export default function Home() {
   const [include, setInclude] = useState("");
   const [exclude, setExclude] = useState("");
   const [proxyGroup, setProxyGroup] = useState("");
-  const [rule, setRule] = useState("");
+  const [rules, setRules] = useState("");
   const [configContent, setConfigContent] = useState("");
   const [modifiedConfigContent, setModifiedConfigContent] = useState("");
 
@@ -36,8 +36,8 @@ export default function Home() {
     url
   )}&proxy_group=${!proxyGroup ? '' : encodeURIComponent(
     JSON.stringify(JSON.parse(proxyGroup))
-  )}&rule=${!rule ? '' : encodeURIComponent(
-    rule
+  )}&rule=${!rules ? '' : encodeURIComponent(
+    rules
   )}`;
 
   let urlHost = "";
@@ -191,8 +191,8 @@ ${urlHost || "egroup"} = select, policy-path=${convertedUrl}
                   <input
                     className="w-full h-full p-4 text-lg bg-white rounded-lg shadow-sm focus:outline-none"
                     placeholder="粘贴 新增的Rule到这里"
-                    value={rule}
-                    onChange={(e) => setRule(e.target.value)}
+                    value={rules}
+                    onChange={(e) => setRules(e.target.value)}
                   />
                 </div>
                 <div className="relative">

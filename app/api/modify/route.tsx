@@ -7,7 +7,7 @@ import { Buffer } from "buffer";
 export const runtime = 'edge';
 
 export async function GET(request: NextRequest,
-    { params }: { params: { url: string, proxy_group: string, rule: string } }
+    { params }: { params: { url: string, proxy_group: string, rules: string } }
 ) {
 
     // 使用模板字符串输出日志信息
@@ -93,8 +93,11 @@ export async function GET(request: NextRequest,
         })
     }
 
-    if (params?.rule && configData['rules']) {
-        configData['rules'].unshift(params?.rule)
+    if (params?.rules && configData['rules']) {
+        const rules_json = JSON.parse(params?.rules)
+        rules_json.forEach((rule_json: any) => {
+            configData['rules'].unshift(rule_json)
+        })
     }
 
     const response = YAML.stringify(configData);
