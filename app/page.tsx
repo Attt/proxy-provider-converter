@@ -36,7 +36,7 @@ export default function Home() {
     url
   )}&proxy_group=${!proxyGroup ? '' : encodeURIComponent(
     JSON.stringify(JSON.parse(proxyGroup))
-  )}&rule=${!rules ? '' : encodeURIComponent(
+  )}&rules=${!rules ? '' : encodeURIComponent(
     rules
   )}`;
 
