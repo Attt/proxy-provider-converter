@@ -97,7 +97,7 @@ export async function GET(request: NextRequest,
         configData['rules'].unshift(params?.rule)
     }
 
-    const response = YAML.stringify({ configData });
+    const response = YAML.stringify(configData);
         return new Response(response, {
             status: 200,
             headers: { 'Content-Type': 'text/plain; charset=utf-8' },
