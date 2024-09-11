@@ -34,9 +34,9 @@ export default function Home() {
   // url: string, proxy_group: string, rule: string
   const modifyUrl = `${host}/api/modify?url=${encodeURIComponent(
     url
-  )}&proxy_group=${encodeURIComponent(
+  )}&proxy_group=${!proxyGroup ? '' : encodeURIComponent(
     JSON.stringify(JSON.parse(proxyGroup))
-  )}&rule=${encodeURIComponent(
+  )}&rule=${!rule ? '' : encodeURIComponent(
     rule
   )}`;
 
